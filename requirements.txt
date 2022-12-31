@@ -1,0 +1,5 @@
+mss
+pillow
+pyserial
+pywin32
+random
