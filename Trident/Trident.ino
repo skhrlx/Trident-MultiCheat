@@ -4,9 +4,9 @@
 char incomingByte;
 
 void setup() {
-  delay(1000);
+  delay(2000);
   Keyboard.begin();
-  delay(1000);
+  delay(2000);
   Serial.begin(128000);
 }
 void loop(){
@@ -46,7 +46,7 @@ void loop(){
 
 
 void mm_bhop(){
-  Mouse.move(0, 0, -10);
+  Mouse.move(0, 0, 1);
 }
 
 void rcs(){
