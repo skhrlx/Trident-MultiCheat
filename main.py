@@ -11,11 +11,12 @@ from PIL import ImageGrab, Image
 arduino = serial.Serial('COM5', 128000)
 
 GC = False
-MM = False
+MM = True
 VALORANT = False
-RCS = False
-TRIGGERBOT = False
-MINECRAFT = True
+RCS = True
+TRIGGERBOT = True
+MINECRAFT = False
+
 S_HEIGHT, S_WIDTH  = ImageGrab.grab().size
 #S_HEIGHT = 768
 #S_WIDTH = 1024 
@@ -95,7 +96,7 @@ if __name__ == "__main__":
         
         if win32api.GetAsyncKeyState(0x01) and RCS:
             rcs()
-            sleep(0.01)
+            sleep(0.04)
             continue
         
         if win32api.GetAsyncKeyState(0x06) and TRIGGERBOT:
