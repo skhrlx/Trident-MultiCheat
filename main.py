@@ -6,7 +6,8 @@ import serial
 from win32 import win32api
 from mss import base, mss
 from PIL import ImageGrab, Image
-#import pygetwindow as gw
+import cv2
+import numpy as np
 
 arduino = serial.Serial('COM5', 128000)
 
@@ -16,11 +17,59 @@ VALORANT = False
 RCS = True
 TRIGGERBOT = True
 MINECRAFT = False
-
 S_HEIGHT, S_WIDTH  = ImageGrab.grab().size
-#S_HEIGHT = 768
-#S_WIDTH = 1024 
 GRABZONE           = 3
+ 
+class AimBot:
+    def __init__(self, fov=10):
+        self.fov = fov
+        self.sct = mss()
+        self.screenshot = self.sct.monitors[1]
+        self.screenshot['left'] = int((self.screenshot['width'] / 2) - (self.fov / 2))
+        self.screenshot['top'] = int((self.screenshot['height'] / 2) - (self.fov / 2))
+        self.screenshot['width'] = self.fov
+        self.screenshot['height'] = self.fov
+        self.center = self.fov / 2
+
+        self.lower = np.array([140, 111, 160])
+        self.upper = np.array([148, 154, 194])
+
+        self.xspd = 0.8
+        self.yspd = 0.8
+        print("Ready !")
+
+    def mousemove(self, x, y):
+        if x < 0:
+            x = x + 256
+        if y < 0:
+            y = y + 256
+
+        pax = [int(x), int(y)]
+        arduino.write(pax)
+
+    def run(self):
+                img = np.array(self.sct.grab(self.screenshot))
+                hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+                mask = cv2.inRange(hsv, self.lower, self.upper)
+                kernel = np.ones((3, 3), np.uint8)
+                dilated = cv2.dilate(mask, kernel, iterations=5)
+                thresh = cv2.threshold(dilated, 60, 255, cv2.THRESH_BINARY)[1]
+                contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+                if len(contours) != 0:
+                    M = cv2.moments(thresh)
+                    point_to_aim = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+
+                    closestX = point_to_aim[0] + 2
+                    closestY = point_to_aim[1] - 5
+
+                    diff_x = int(closestX - self.center)
+                    diff_y = int(closestY - self.center)
+
+                    target_x = diff_x * self.xspd
+                    target_y = diff_y * self.yspd
+
+                    self.mousemove(target_x, target_y)
+
 def gc_bhop(): 
     return arduino.write(b'l')
     
@@ -29,7 +78,6 @@ def mm_bhop():
 
 def rcs():
     return arduino.write(b'k')
-
     
 def valorant_bhop():
     return arduino.write(b'i')
