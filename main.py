@@ -20,22 +20,8 @@ AIMBOT = True
 S_HEIGHT, S_WIDTH  = ImageGrab.grab().size
 GRABZONE           = 3
     
-def bhop():
-    return arduino.write(b'o')
-
-def rcs():
-    pax = [int(4)]
-    return arduino.write(pax)
-
-def shoot(): 
-    pax = [int(2)]
-    return arduino.write(pax)
-
-def left_ac(): 
-    return arduino.write(b'm')
-
-def right_ac(): 
-    return arduino.write(b'n')
+def pax(int(value)):
+    return arduino.write(value)
 
 class FoundEnemy(Exception):
     pass
