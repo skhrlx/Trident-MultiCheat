@@ -11,9 +11,7 @@ import numpy as np
 
 arduino = serial.Serial('COM5', 128000)
 
-GC = False
-MM = False
-VALORANT = False
+BHOP = True
 RCS = True
 TRIGGERBOT = True
 MINECRAFT = False
@@ -21,21 +19,15 @@ AIMBOT = True
 
 S_HEIGHT, S_WIDTH  = ImageGrab.grab().size
 GRABZONE           = 3
-
-def gc_bhop(): 
-    return arduino.write(b'l')
     
-def mm_bhop():
+def bhop():
     return arduino.write(b'o')
 
 def rcs():
     pax = [int(4)]
     return arduino.write(pax)
-    
-def valorant_bhop():
-    return arduino.write(b'i')
 
-def shoot_kb(): 
+def shoot(): 
     pax = [int(2)]
     return arduino.write(pax)
 
@@ -128,30 +120,22 @@ class TriggerBot:
                     if self.color_check(r, g, b): raise FoundEnemy
         
         except FoundEnemy:
-            shoot_kb()
+            shoot()
 
 if __name__ == "__main__":
     _hash = sha256(f'{random.random()}'.encode('utf-8')).hexdigest()
     print(_hash), system(f'title {_hash}'), sleep(0.5), system('@echo off'), system('cls')
-    bot = TriggerBot()
+    trigger = TriggerBot()
     aim = AimBot()
     while True:
-        
-        if win32api.GetAsyncKeyState(0x20) and GC:
-            gc_bhop()
-            continue
 
         if win32api.GetAsyncKeyState(0x01) and AIMBOT:
             aim.run()
             continue
         
         if win32api.GetAsyncKeyState(0x20) and MM:
-            mm_bhop()
+            bhop()
             sleep(0.005)
-            continue
-        
-        if win32api.GetAsyncKeyState(0x20) and VALORANT:
-            valorant_bhop()
             continue
         
         if win32api.GetAsyncKeyState(0x01) and RCS:
@@ -160,7 +144,7 @@ if __name__ == "__main__":
             continue
         
         if win32api.GetAsyncKeyState(0x06) and TRIGGERBOT:
-            bot.scan()
+            trigger.scan()
             continue
 
         if win32api.GetAsyncKeyState(0x06) and MINECRAFT:
