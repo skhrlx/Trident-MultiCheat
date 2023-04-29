@@ -8,31 +8,57 @@ from mss import base, mss
 from PIL import ImageGrab, Image
 import cv2
 import numpy as np
+import threading
+import keyboard
 
-arduino = serial.Serial('COM5', 128000)
+arduino = serial.Serial('COM3', 128000)
 
-BHOP = True
+BHOP = False
 RCS = True
 TRIGGERBOT = True
 MINECRAFT = False
 AIMBOT = True
+FORTNITE = False
 
 S_HEIGHT, S_WIDTH  = ImageGrab.grab().size
 GRABZONE           = 3
-    
-def pax(int(value)):
-    return arduino.write(value)
+
+def bhop(): 
+    pax = [int(1)]
+    return arduino.write(pax)
+
+def rcs():
+    pax = [int(4)]
+    return arduino.write(pax)
+
+def shoot_kb(): 
+    pax = [int(2)]
+    return arduino.write(pax)
+
+def right_ac(): 
+    pax = [int(5)]
+    return arduino.write(pax)
+
+def down():
+    pax = [int(6)]
+    print("mouse down")
+    return arduino.write(pax)
+
+def up():
+    pax = [int(7)]
+    print("mouse up")
+    return arduino.write(pax)
 
 class FoundEnemy(Exception):
     pass
 
 class AimBot:
-    def __init__(self, fov=20):
+    def __init__(self):
         self.lower = np.array([140, 111, 160])
         self.upper = np.array([148, 154, 194])
 
-        self.xspd = 0.8
-        self.yspd = 0.8
+        self.xspd = 1.8 #1.3
+        self.yspd = 0.3 #0.3
         print("Ready !")
 
     def mousemove(self, x, y):
@@ -46,7 +72,7 @@ class AimBot:
 
     def grab(self):
         self.sct = mss()
-        self.fov = 10
+        self.fov = 45 #37
         self.screenshot = self.sct.monitors[1]
         self.screenshot['left'] = int((self.screenshot['width'] / 2) - (self.fov / 2))
         self.screenshot['top'] = int((self.screenshot['height'] / 2) - (self.fov / 2))
@@ -69,18 +95,21 @@ class AimBot:
             M = cv2.moments(thresh)
             point_to_aim = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
 
-            closestX = point_to_aim[0] + 2
-            closestY = point_to_aim[1] - 5
+            closestX = point_to_aim[0] + 1.0 #+ 1
+            closestY = point_to_aim[1] - 6.5 #- 5
 
             diff_x = int(closestX - self.center)
             diff_y = int(closestY - self.center)
 
-            target_x = diff_x * self.xspd
-            target_y = diff_y * self.yspd
+            target_x = diff_x * self.xspd / 1.1
+            target_y = diff_y * self.yspd / 1.1
 
             self.mousemove(target_x, target_y)
 
 class TriggerBot:
+
+    def __init__(self):
+        print("Ready !")
 
     def color_check(self, red: int, green: int, blue: int) -> bool:
         if green >= 0xAA: return False
@@ -106,7 +135,7 @@ class TriggerBot:
                     if self.color_check(r, g, b): raise FoundEnemy
         
         except FoundEnemy:
-            shoot()
+            shoot_kb()
 
 if __name__ == "__main__":
     _hash = sha256(f'{random.random()}'.encode('utf-8')).hexdigest()
@@ -114,34 +143,34 @@ if __name__ == "__main__":
     trigger = TriggerBot()
     aim = AimBot()
     while True:
-
+        aim.run()
         if win32api.GetAsyncKeyState(0x01) and AIMBOT:
-            aim.run()
-            continue
+            aim.run(), rcs(), rcs()
         
-        if win32api.GetAsyncKeyState(0x20) and MM:
+        if win32api.GetAsyncKeyState(0x06) and AIMBOT:
+            aim.run()
+
+        if win32api.GetAsyncKeyState(0x20) and BHOP:
             bhop()
-            sleep(0.005)
+            #random_sleep = random.uniform(0.01, 0.015)
+            #sleep(random_sleep)
+            sleep(0.000001)
             continue
         
         if win32api.GetAsyncKeyState(0x01) and RCS:
             rcs()
-            sleep(0.04)
+            sleep(0.012)
             continue
         
-        if win32api.GetAsyncKeyState(0x06) and TRIGGERBOT:
+        if win32api.GetAsyncKeyState(0x05) and TRIGGERBOT:
             trigger.scan()
-            continue
 
         if win32api.GetAsyncKeyState(0x06) and MINECRAFT:
-            left_ac()
+            shoot_kb()
             random_sleep = random.uniform(0.055, 0.075)
             sleep(random_sleep)
-            continue
 
         if win32api.GetAsyncKeyState(0x05) and MINECRAFT:
             right_ac()
-            sleep(0.01)
-            continue
-
-        sleep(0.0025)
+            random_sleep = random.uniform(0.055, 0.075)
+            sleep(random_sleep)
