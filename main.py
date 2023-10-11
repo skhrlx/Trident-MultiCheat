@@ -8,17 +8,15 @@ from mss import base, mss
 from PIL import ImageGrab, Image
 import cv2
 import numpy as np
-import threading
-import keyboard
 
 arduino = serial.Serial('COM3', 128000)
 
-BHOP = False
-RCS = True
-TRIGGERBOT = True
-MINECRAFT = False
-AIMBOT = True
-FORTNITE = False
+BHOP = False #working smooth for CS:GO, and CS2, valve made the BHOP most difficult, so, it can help you...(You can edit the delay and the amount of scrolls to fit better for you)
+RCS = True #i made it better, currently in the updated source, it is working smooth asf, writing the perfect recoil and legit, this old script just down your mouse...you can do better
+TRIGGERBOT = True #slow
+MINECRAFT = False #a good approach is use a usb host shield and arduino leonardo, I can use it as 40CPS (LEFT) and 550CPS (RIGHT) clicker, without getting banned by screenshare/ac since is only hardware and it will bypass everyone
+AIMBOT = True #slow
+FORTNITE = False # I coded an fortnite edit macro as well, but this source is VERY outdated. The macro performs good
 
 S_HEIGHT, S_WIDTH  = ImageGrab.grab().size
 GRABZONE           = 3
