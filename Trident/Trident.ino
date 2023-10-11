@@ -1,16 +1,13 @@
 #include <Keyboard.h>
 #include <Mouse.h>
 
-#define CMD_JUMP   1  // No arguments
-#define CMD_SHOOT  2  // No arguments
-#define CMD_AIM    3  // x, y -> how much to move mouse to in X and Y axis
-#define CMD_RCS    4  // n - number of NOT dormant enemies (hp, weapon, position)
-#define CMD_AFK    5
+#define CMD_JUMP   1
+#define CMD_SHOOT  2
+#define CMD_AIM    3
+#define CMD_RCS    4
 
 void setup() {
-  delay(2000);
   Keyboard.begin();
-  delay(2000);
   Serial.begin(128000);
 }
 void loop() {
